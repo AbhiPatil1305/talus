@@ -9,7 +9,10 @@ import {
   Compass,
 } from 'lucide-react';
 import { ModuleCard } from './ModuleCard';
-import { BASIC_INCISION_PROCEDURE } from '../assessment/procedureConfig';
+import {
+  TALUS_ARTHROTOMY_PROCEDURE,
+  MCBURNEY_APPENDECTOMY_PROCEDURE,
+} from '../assessment/procedureConfig';
 import { loadSessionHistory, clearSessionHistory } from '../assessment/assessment';
 import { SessionSummary } from '../../shared/types';
 
@@ -36,16 +39,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center space-x-2 bg-cyan-950/80 border border-cyan-800/60 px-3 py-1 rounded-full text-xs font-semibold text-cyan-400 mb-4">
             <Compass className="w-3.5 h-3.5" />
-            <span>Interactive Psychomotor Surgical Skills Practice</span>
+            <span>Interactive Surgical Anatomy & Psychomotor Training</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Standardized Surgical Skills Training, Directly in the Browser.
+            Anatomical Surgical Skills Practice, Directly in the Browser.
           </h1>
           <p className="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed">
-            TALUS combines interactive real-time 3D instrument simulation with deterministic,
-            rule-based event validation. Practice precision incision tracking, respect tissue
-            boundaries, and receive instant rubric feedback—powered entirely on client devices with
-            optional webcam hand tracking.
+            TALUS combines interactive real-time 3D human body anatomy with deterministic,
+            rule-based event validation. Practice anatomical landmark identification, safe surgical
+            corridor incisions, and tissue layer exploration on real human body structures—complete
+            with sterile surgical draping and Povidone-Iodine skin prep.
           </p>
         </div>
       </section>
@@ -56,44 +59,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
           <div>
             <h2 className="text-xl font-bold text-white flex items-center space-x-2">
               <Activity className="w-5 h-5 text-cyan-400" />
-              <span>Available Practice Modules</span>
+              <span>Available Anatomical Training Modules</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Select a module to launch the interactive 3D practice laboratory.
+              Select an anatomical region to launch the 3D surgical operating theatre.
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Module 1: Ankle & Talus Arthrotomy */}
           <ModuleCard
-            procedure={BASIC_INCISION_PROCEDURE}
-            onSelect={() => onStartSimulation(BASIC_INCISION_PROCEDURE.id)}
+            procedure={TALUS_ARTHROTOMY_PROCEDURE}
+            onSelect={() => onStartSimulation(TALUS_ARTHROTOMY_PROCEDURE.id)}
           />
 
-          {/* Module 2 Stretch/Preview Card */}
-          <div className="bg-slate-900/40 border border-slate-800/60 border-dashed rounded-2xl p-6 flex flex-col justify-between opacity-70">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="bg-slate-800 text-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md uppercase">
-                  Advanced Stretch Module
-                </span>
-                <span className="text-xs text-slate-500">Coming Soon</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-300">
-                Laparoscopic Grasp & Transfer Protocol
-              </h3>
-              <p className="text-sm text-slate-500 mt-2">
-                Dual-instrument coordinate handoff with 6-DOF target ring positioning and bilateral
-                pinch kinematics.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-800/40 flex justify-between items-center text-xs text-slate-500">
-              <span>Rubric v2026.2 (Planned)</span>
-              <button disabled className="px-3.5 py-1.5 bg-slate-800/50 text-slate-500 rounded-lg cursor-not-allowed">
-                Planned
-              </button>
-            </div>
-          </div>
+          {/* Module 2: Abdominal McBurney Incision */}
+          <ModuleCard
+            procedure={MCBURNEY_APPENDECTOMY_PROCEDURE}
+            onSelect={() => onStartSimulation(MCBURNEY_APPENDECTOMY_PROCEDURE.id)}
+          />
         </div>
       </section>
 
@@ -117,7 +102,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
 
         {history.length === 0 ? (
           <div className="text-center py-8 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
-            No completed attempts recorded yet. Launch Module 1 above to begin your first practice session!
+            No completed attempts recorded yet. Launch an anatomical module above to begin your first surgical practice session!
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -125,7 +110,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
               <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-2.5 px-4 rounded-l-lg">Timestamp</th>
-                  <th className="py-2.5 px-4">Module</th>
+                  <th className="py-2.5 px-4">Anatomical Module</th>
                   <th className="py-2.5 px-4">Score</th>
                   <th className="py-2.5 px-4">Checkpoints</th>
                   <th className="py-2.5 px-4">Errors</th>
@@ -173,35 +158,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
         )}
       </section>
 
-      {/* Team Architecture & Ownership Reference */}
+      {/* Anatomical Exploration & Team Reference */}
       <section className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6">
         <h3 className="text-sm font-bold text-white flex items-center space-x-2 mb-3">
           <Users className="w-4 h-4 text-cyan-400" />
-          <span>Hackathon Team Workstream Modular Structure</span>
+          <span>Anatomical Layers & Team Workstream Architecture</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">Member 1 — Frontend & Lead</span>
+            <span className="text-cyan-400 font-bold block">1. Skin & Drapes</span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              App shell, navigation, dashboard, design system, integration.
+              Fenestrated surgical drapes, Betadine prep zone, epidermis/dermis contour.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">Member 2 — 3D Simulation</span>
+            <span className="text-cyan-400 font-bold block">2. Subcutaneous & Fascia</span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Three.js scene, virtual instrument cursor, targets, event triggers.
+              Adipose yellow layer, extensor retinaculum fascia, tendon bundles.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">Member 3 — Computer Vision</span>
+            <span className="text-cyan-400 font-bold block">3. Talus Bone & Joint</span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              MediaPipe Hand Landmarker, pinch heuristic, mouse fallback contract.
+              Talar dome articular cartilage, distal tibia, lateral fibular malleolus.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">Member 4 — Assessment</span>
+            <span className="text-cyan-400 font-bold block">4. Deterministic Rubric</span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Checkpoints, deterministic scoring, pure validation, localStorage.
+              Palpation registration, safe corridor respect, 100% deterministic rules.
             </span>
           </div>
         </div>

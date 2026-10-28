@@ -8,7 +8,8 @@ interface TargetProps {
 }
 
 /**
- * 3D Representation of surgical training targets and incision guideline.
+ * 3D Representation of Surgical Skin Markings (Gentian-Violet Pen)
+ * and anatomical landmark guidance crosshairs on the operative field.
  */
 export const Targets: React.FC<TargetProps> = ({
   checkpoints,
@@ -17,41 +18,43 @@ export const Targets: React.FC<TargetProps> = ({
 }) => {
   return (
     <group>
-      {/* Practice Pad Incision Guideline Track */}
-      <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[4.2, 0.08]} />
-        <meshBasicMaterial color="#475569" />
+      {/* Surgical Skin Pen Marking (Dashed Gentian Violet Incision Line) */}
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4.2, 0.04]} />
+        <meshBasicMaterial color="#581c87" /> {/* Surgical violet marker */}
       </mesh>
 
-      {/* Trajectory Dashed Center Mark */}
-      <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[4.0, 0.02]} />
-        <meshBasicMaterial color="#94a3b8" />
-      </mesh>
+      {/* Crosshatch Guideline Marks across incision */}
+      {[-1.5, -0.75, 0.0, 0.75, 1.5].map((xPos, idx) => (
+        <mesh key={idx} position={[xPos, 0.082, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
+          <planeGeometry args={[0.22, 0.02]} />
+          <meshBasicMaterial color="#6b21a8" />
+        </mesh>
+      ))}
 
-      {/* Target Nodes */}
+      {/* Landmark Nodes */}
       {checkpoints.map((cp) => {
         const isCompleted = completedIds.includes(cp.id);
         const isCurrent = currentCheckpointId === cp.id;
 
-        let nodeColor = '#64748b'; // Pending
-        let emissiveIntensity = 0.1;
+        let nodeColor = '#6b21a8'; // Surgical violet default
+        let emissiveIntensity = 0.2;
 
         if (isCompleted) {
           nodeColor = '#10b981'; // Completed emerald
-          emissiveIntensity = 0.5;
+          emissiveIntensity = 0.6;
         } else if (isCurrent) {
           nodeColor = '#06b6d4'; // Current active cyan
-          emissiveIntensity = 0.8;
+          emissiveIntensity = 0.9;
         }
 
         const [tx, ty, tz] = cp.targetPosition;
 
         return (
-          <group key={cp.id} position={[tx, ty, tz]}>
-            {/* Target Core Bead */}
-            <mesh position={[0, 0.06, 0]}>
-              <sphereGeometry args={[0.14, 16, 16]} />
+          <group key={cp.id} position={[tx, ty + 0.08, tz]}>
+            {/* Surgical Marking Crosshair Bead */}
+            <mesh position={[0, 0.04, 0]}>
+              <sphereGeometry args={[0.11, 16, 16]} />
               <meshStandardMaterial
                 color={nodeColor}
                 emissive={nodeColor}
@@ -60,20 +63,22 @@ export const Targets: React.FC<TargetProps> = ({
               />
             </mesh>
 
-            {/* Tolerance Boundary Ring on Surface */}
-            <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[cp.toleranceRadius - 0.04, cp.toleranceRadius, 32]} />
+            {/* Tolerance Boundary Circle */}
+            <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[cp.toleranceRadius - 0.03, cp.toleranceRadius, 32]} />
               <meshBasicMaterial
                 color={nodeColor}
                 transparent
-                opacity={isCurrent ? 0.8 : isCompleted ? 0.3 : 0.15}
+                opacity={isCurrent ? 0.8 : isCompleted ? 0.35 : 0.2}
               />
             </mesh>
 
-            {/* Order Marker Tag */}
-            <mesh position={[0, 0.28, 0]}>
-              <cylinderGeometry args={[0.08, 0.08, 0.04, 16]} />
-              <meshStandardMaterial color={isCurrent ? '#06b6d4' : '#1e293b'} />
+            {/* Anatomical Landmark Step Badge */}
+            <mesh position={[0, 0.22, 0]}>
+              <cylinderGeometry args={[0.08, 0.08, 0.03, 16]} />
+              <meshStandardMaterial
+                color={isCurrent ? '#06b6d4' : isCompleted ? '#10b981' : '#334155'}
+              />
             </mesh>
           </group>
         );

@@ -34,3 +34,5 @@ Thumbs.db
 .vite/
 vitest.config.ts.timestamp*
 *.tsbuildinfo
+vite.config.d.ts
+vite.config.js

@@ -6,7 +6,10 @@ import { DashboardView } from '../features/dashboard/DashboardView';
 import { SimulationScene } from '../features/simulation/SimulationScene';
 import { SimulationControls } from '../features/simulation/SimulationControls';
 import { CompletionSummary } from '../features/assessment/CompletionSummary';
-import { BASIC_INCISION_PROCEDURE } from '../features/assessment/procedureConfig';
+import {
+  TALUS_ARTHROTOMY_PROCEDURE,
+  MCBURNEY_APPENDECTOMY_PROCEDURE,
+} from '../features/assessment/procedureConfig';
 import {
   evaluateSession,
   saveSessionSummary,
@@ -17,11 +20,13 @@ import {
   SimulationEvent,
   AssessmentResult,
   SessionSummary,
+  ProcedureConfig,
 } from '../shared/types';
 import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>('dashboard');
+  const [currentProcedure, setCurrentProcedure] = useState<ProcedureConfig>(TALUS_ARTHROTOMY_PROCEDURE);
   const [completedCheckpointIds, setCompletedCheckpointIds] = useState<string[]>([]);
   const [recordedEvents, setRecordedEvents] = useState<SimulationEvent[]>([]);
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
@@ -44,13 +49,18 @@ export const App: React.FC = () => {
     []
   );
 
-  const startSimulation = useCallback((procedureId: string = BASIC_INCISION_PROCEDURE.id) => {
+  const startSimulation = useCallback((procedureId: string = TALUS_ARTHROTOMY_PROCEDURE.id) => {
+    const proc =
+      procedureId === MCBURNEY_APPENDECTOMY_PROCEDURE.id
+        ? MCBURNEY_APPENDECTOMY_PROCEDURE
+        : TALUS_ARTHROTOMY_PROCEDURE;
+    setCurrentProcedure(proc);
     const now = Date.now();
     setCompletedCheckpointIds([]);
     setRecordedEvents([
       {
         type: 'SIMULATION_STARTED',
-        procedureId,
+        procedureId: proc.id,
         timestamp: now,
       },
     ]);
@@ -58,7 +68,7 @@ export const App: React.FC = () => {
     setAssessmentResult(null);
     setViewState('simulation');
     showToast(
-      'Practice lab initialized. Follow the highlighted checkpoint guidance.',
+      `${proc.title} initialized. Follow surgical landmark guidance.`,
       'info'
     );
   }, [showToast]);
@@ -70,25 +80,24 @@ export const App: React.FC = () => {
       if (event.type === 'CHECKPOINT_COMPLETED') {
         const validation = validateEvent(
           event,
-          BASIC_INCISION_PROCEDURE,
+          currentProcedure,
           completedCheckpointIds
         );
 
         if (validation.isValid) {
           const updated = [...completedCheckpointIds, event.checkpointId];
           setCompletedCheckpointIds(updated);
-          const cp = BASIC_INCISION_PROCEDURE.checkpoints.find(
+          const cp = currentProcedure.checkpoints.find(
             (c) => c.id === event.checkpointId
           );
           showToast(
-            `Checkpoint ${updated.length}/${BASIC_INCISION_PROCEDURE.checkpoints.length} verified: ${cp?.title}`,
+            `Step ${updated.length}/${currentProcedure.checkpoints.length} verified: ${cp?.title}`,
             'success'
           );
 
-          // If all completed, notify user
-          if (updated.length === BASIC_INCISION_PROCEDURE.checkpoints.length) {
+          if (updated.length === currentProcedure.checkpoints.length) {
             showToast(
-              'All checkpoints completed! Click "Complete & View Assessment" below.',
+              'All anatomical landmarks verified! Conclude session to view assessment.',
               'success'
             );
           }
@@ -97,12 +106,12 @@ export const App: React.FC = () => {
         }
       } else if (event.type === 'INVALID_ACTION') {
         showToast(
-          `Technique violation recorded: ${event.reason} (-15 pts)`,
+          `Surgical safety violation: ${event.reason} (-15 pts)`,
           'error'
         );
       }
     },
-    [completedCheckpointIds, showToast]
+    [completedCheckpointIds, currentProcedure, showToast]
   );
 
   const handleTriggerInvalidAction = (reason: string) => {
@@ -120,7 +129,7 @@ export const App: React.FC = () => {
     setRecordedEvents([
       {
         type: 'SIMULATION_STARTED',
-        procedureId: BASIC_INCISION_PROCEDURE.id,
+        procedureId: currentProcedure.id,
         timestamp: now,
       },
     ]);
@@ -132,18 +141,17 @@ export const App: React.FC = () => {
     const endTime = Date.now();
     const result = evaluateSession(
       recordedEvents,
-      BASIC_INCISION_PROCEDURE,
+      currentProcedure,
       sessionStartTime,
       endTime
     );
 
     setAssessmentResult(result);
 
-    // Save summary to localStorage
     const summary: SessionSummary = {
       sessionId: `session_${Date.now()}`,
-      procedureId: BASIC_INCISION_PROCEDURE.id,
-      procedureTitle: BASIC_INCISION_PROCEDURE.title,
+      procedureId: currentProcedure.id,
+      procedureTitle: currentProcedure.title,
       result,
       completedAt: new Date().toISOString(),
     };
@@ -153,7 +161,7 @@ export const App: React.FC = () => {
   };
 
   const isAllCheckpointsComplete =
-    completedCheckpointIds.length === BASIC_INCISION_PROCEDURE.checkpoints.length;
+    completedCheckpointIds.length === currentProcedure.checkpoints.length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30">
@@ -202,21 +210,21 @@ export const App: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
-                  {BASIC_INCISION_PROCEDURE.category} • Module 1
+                  {currentProcedure.category} &bull; {currentProcedure.title}
                 </span>
                 <h1 className="text-xl font-bold text-white">
-                  {BASIC_INCISION_PROCEDURE.title}
+                  {currentProcedure.title}
                 </h1>
               </div>
               <div className="text-xs text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Deterministic Event Recorder Active</span>
+                <span>Operating Theatre &bull; Deterministic Assessment</span>
               </div>
             </div>
 
             {/* 3D Canvas Scene */}
             <SimulationScene
-              procedure={BASIC_INCISION_PROCEDURE}
+              procedure={currentProcedure}
               completedCheckpointIds={completedCheckpointIds}
               onSimulationEvent={handleSimulationEvent}
               onReset={handleResetSimulation}
@@ -235,8 +243,8 @@ export const App: React.FC = () => {
         {viewState === 'summary' && assessmentResult && (
           <CompletionSummary
             result={assessmentResult}
-            procedure={BASIC_INCISION_PROCEDURE}
-            onRetry={() => startSimulation(BASIC_INCISION_PROCEDURE.id)}
+            procedure={currentProcedure}
+            onRetry={() => startSimulation(currentProcedure.id)}
             onBackToDashboard={() => setViewState('dashboard')}
           />
         )}
