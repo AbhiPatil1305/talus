@@ -7,11 +7,16 @@ import {
   XCircle,
   Users,
   Compass,
+  Heart,
+  Brain,
+  Sparkles,
 } from 'lucide-react';
 import { ModuleCard } from './ModuleCard';
 import {
+  CARDIAC_CABG_PROCEDURE,
   TALUS_ARTHROTOMY_PROCEDURE,
-  MCBURNEY_APPENDECTOMY_PROCEDURE,
+  KIDNEY_NEPHRECTOMY_PROCEDURE,
+  CRANIOFACIAL_PROCEDURE,
 } from '../assessment/procedureConfig';
 import { loadSessionHistory, clearSessionHistory } from '../assessment/assessment';
 import { SessionSummary } from '../../shared/types';
@@ -38,46 +43,58 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-cyan-950/40 border border-slate-800 p-8 sm:p-10 shadow-2xl">
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center space-x-2 bg-cyan-950/80 border border-cyan-800/60 px-3 py-1 rounded-full text-xs font-semibold text-cyan-400 mb-4">
-            <Compass className="w-3.5 h-3.5" />
-            <span>Interactive Surgical Anatomy & Psychomotor Training</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Real 3D Human Anatomy &amp; Organ Simulations</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Anatomical Surgical Skills Practice, Directly in the Browser.
+            Work Directly on Real Human Organs &amp; Body Parts.
           </h1>
           <p className="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed">
-            TALUS combines interactive real-time 3D human body anatomy with deterministic,
-            rule-based event validation. Practice anatomical landmark identification, safe surgical
-            corridor incisions, and tissue layer exploration on real human body structures—complete
-            with sterile surgical draping and Povidone-Iodine skin prep.
+            TALUS features high-fidelity 3D models of authentic human anatomy: the human heart,
+            laser-scanned human craniofacial anatomy, kidneys, and talus ankle joint. Practice
+            landmark registration, incision corridors, and vascular navigation in an authentic operating
+            theatre environment—with deterministic, rules-based feedback.
           </p>
         </div>
       </section>
 
-      {/* Training Module Catalog */}
+      {/* Real Anatomical Modules Catalog */}
       <section>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-white flex items-center space-x-2">
               <Activity className="w-5 h-5 text-cyan-400" />
-              <span>Available Anatomical Training Modules</span>
+              <span>Real 3D Human Anatomical Training Modules</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Select an anatomical region to launch the 3D surgical operating theatre.
+              Select an authentic human body part to launch the interactive surgical operating theatre.
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Module 1: Ankle & Talus Arthrotomy */}
+          {/* Module 1: Real Human Heart */}
+          <ModuleCard
+            procedure={CARDIAC_CABG_PROCEDURE}
+            onSelect={() => onStartSimulation(CARDIAC_CABG_PROCEDURE.id)}
+          />
+
+          {/* Module 2: Ankle & Talus Bone */}
           <ModuleCard
             procedure={TALUS_ARTHROTOMY_PROCEDURE}
             onSelect={() => onStartSimulation(TALUS_ARTHROTOMY_PROCEDURE.id)}
           />
 
-          {/* Module 2: Abdominal McBurney Incision */}
+          {/* Module 3: Real Human Kidney */}
           <ModuleCard
-            procedure={MCBURNEY_APPENDECTOMY_PROCEDURE}
-            onSelect={() => onStartSimulation(MCBURNEY_APPENDECTOMY_PROCEDURE.id)}
+            procedure={KIDNEY_NEPHRECTOMY_PROCEDURE}
+            onSelect={() => onStartSimulation(KIDNEY_NEPHRECTOMY_PROCEDURE.id)}
+          />
+
+          {/* Module 4: Real Human Head 3D Laser Scan */}
+          <ModuleCard
+            procedure={CRANIOFACIAL_PROCEDURE}
+            onSelect={() => onStartSimulation(CRANIOFACIAL_PROCEDURE.id)}
           />
         </div>
       </section>
@@ -110,7 +127,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
               <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-2.5 px-4 rounded-l-lg">Timestamp</th>
-                  <th className="py-2.5 px-4">Anatomical Module</th>
+                  <th className="py-2.5 px-4">Human Organ / Part</th>
                   <th className="py-2.5 px-4">Score</th>
                   <th className="py-2.5 px-4">Checkpoints</th>
                   <th className="py-2.5 px-4">Errors</th>
@@ -158,35 +175,47 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onStartSimulation 
         )}
       </section>
 
-      {/* Anatomical Exploration & Team Reference */}
+      {/* Real 3D Human Models Reference */}
       <section className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6">
         <h3 className="text-sm font-bold text-white flex items-center space-x-2 mb-3">
-          <Users className="w-4 h-4 text-cyan-400" />
-          <span>Anatomical Layers & Team Workstream Architecture</span>
+          <Heart className="w-4 h-4 text-rose-400" />
+          <span>Real 3D Human Anatomy Models Included</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">1. Skin & Drapes</span>
+            <span className="text-rose-400 font-bold block flex items-center space-x-1">
+              <Heart className="w-3.5 h-3.5" />
+              <span>Real Human Heart</span>
+            </span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Fenestrated surgical drapes, Betadine prep zone, epidermis/dermis contour.
+              High-poly GLB organ model with aortic arch, superior vena cava, and LAD coronary artery.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">2. Subcutaneous & Fascia</span>
+            <span className="text-amber-400 font-bold block flex items-center space-x-1">
+              <Brain className="w-3.5 h-3.5" />
+              <span>Real Head 3D Scan</span>
+            </span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Adipose yellow layer, extensor retinaculum fascia, tendon bundles.
+              Direct 3D scan of living human craniofacial anatomy with real skin surface contours.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">3. Talus Bone & Joint</span>
+            <span className="text-purple-400 font-bold block flex items-center space-x-1">
+              <Compass className="w-3.5 h-3.5" />
+              <span>Real Human Kidney</span>
+            </span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Talar dome articular cartilage, distal tibia, lateral fibular malleolus.
+              Authentic renal parenchyma, cortex, renal artery, vein, and hilum exposure.
             </span>
           </div>
           <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60">
-            <span className="text-cyan-400 font-bold block">4. Deterministic Rubric</span>
+            <span className="text-cyan-400 font-bold block flex items-center space-x-1">
+              <Users className="w-3.5 h-3.5" />
+              <span>Ankle &amp; Talus Joint</span>
+            </span>
             <span className="text-slate-400 text-[11px] mt-1 block">
-              Palpation registration, safe corridor respect, 100% deterministic rules.
+              Fenestrated surgical drapes, Betadine prep, retinaculum, and talar dome cartilage.
             </span>
           </div>
         </div>

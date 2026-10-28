@@ -2,14 +2,15 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Instrument } from './Instrument';
 import { Targets } from './Target';
-import { HumanAnatomy, AnatomyLayer } from './HumanAnatomy';
+import { RealAnatomyModel, RealOrganType } from './RealAnatomyModel';
+import { AnatomyLayer } from './HumanAnatomy';
 import {
   NormalizedInput,
   SimulationEvent,
   ProcedureConfig,
 } from '../../shared/types';
 import { globalInputAdapter } from '../hand-tracking/InputAdapter';
-import { Layers, Eye } from 'lucide-react';
+import { Layers, Eye, Heart, Sparkles, User, Crosshair } from 'lucide-react';
 
 interface SimulationSceneProps {
   procedure: ProcedureConfig;
@@ -27,7 +28,26 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
   const [currentInput, setCurrentInput] = useState<NormalizedInput>(
     globalInputAdapter.getCurrentInput()
   );
+
+  // Derive organ type from procedure ID or allow user manual override in the scene
+  const defaultOrgan: RealOrganType = procedure.id.includes('cardiac')
+    ? 'heart'
+    : procedure.id.includes('kidney')
+    ? 'kidney'
+    : procedure.id.includes('craniofacial')
+    ? 'head'
+    : 'heart'; // default to real heart model!
+
+  const [activeOrgan, setActiveOrgan] = useState<RealOrganType>(defaultOrgan);
   const [activeLayer, setActiveLayer] = useState<AnatomyLayer>('skin');
+
+  // Sync active organ when procedure changes
+  useEffect(() => {
+    if (procedure.id.includes('cardiac')) setActiveOrgan('heart');
+    else if (procedure.id.includes('kidney')) setActiveOrgan('kidney');
+    else if (procedure.id.includes('craniofacial')) setActiveOrgan('head');
+    else if (procedure.id.includes('talus')) setActiveOrgan('ankle');
+  }, [procedure.id]);
 
   // Determine current active checkpoint
   const currentCheckpointIndex = completedCheckpointIds.length;
@@ -99,20 +119,20 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[540px] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 select-none cursor-crosshair"
+      className="relative w-full h-[560px] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 select-none cursor-crosshair"
     >
       <Canvas
-        camera={{ position: [0, 5.0, 3.8], fov: 46 }}
+        camera={{ position: [0, 4.8, 4.2], fov: 46 }}
         style={{ width: '100%', height: '100%' }}
       >
         {/* Operating Theatre Overhead Lighting (Dual Surgical Luminaires) */}
-        <ambientLight intensity={0.65} />
-        <directionalLight position={[4, 12, 4]} intensity={1.8} color="#f8fafc" />
-        <directionalLight position={[-4, 10, -3]} intensity={1.0} color="#e0f2fe" />
-        <pointLight position={[0, 4, 0]} intensity={0.8} color="#ffffff" />
+        <ambientLight intensity={0.75} />
+        <directionalLight position={[4, 12, 4]} intensity={2.2} color="#ffffff" />
+        <directionalLight position={[-4, 10, -3]} intensity={1.2} color="#bae6fd" />
+        <pointLight position={[0, 4, 0]} intensity={1.0} color="#ffffff" />
 
-        {/* 3D Human Lower Limb, Ankle, and Talus Bone Anatomical Model */}
-        <HumanAnatomy layer={activeLayer} />
+        {/* Real 3D Human Anatomy Models */}
+        <RealAnatomyModel organType={activeOrgan} layer={activeLayer} />
 
         {/* Surgical Skin Markings and Landmark Crosshairs */}
         <Targets
@@ -125,42 +145,84 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
         <Instrument input={currentInput} isHoveringTarget={isHovering} />
       </Canvas>
 
-      {/* Anatomical Layer Selector Toggle Bar */}
-      <div className="absolute top-4 right-4 z-20 flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg text-xs">
-        <span className="text-[11px] font-semibold text-slate-400 px-2 flex items-center space-x-1">
-          <Layers className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="hidden sm:inline">Anatomy Layer:</span>
-        </span>
-        <button
-          onClick={() => setActiveLayer('skin')}
-          className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-            activeLayer === 'skin'
-              ? 'bg-cyan-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Skin & Drapes
-        </button>
-        <button
-          onClick={() => setActiveLayer('subcutaneous')}
-          className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-            activeLayer === 'subcutaneous'
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Subcutaneous / Retinaculum
-        </button>
-        <button
-          onClick={() => setActiveLayer('bone')}
-          className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-            activeLayer === 'bone'
-              ? 'bg-emerald-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Talus Bone & Skeleton
-        </button>
+      {/* Top Controls Bar: Organ Switcher & Layer Selector */}
+      <div className="absolute top-4 right-4 z-20 flex flex-col sm:flex-row items-end sm:items-center gap-2">
+        {/* Real Human Organ Switcher */}
+        <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg text-xs">
+          <span className="text-[10px] font-bold text-cyan-400 px-2 flex items-center space-x-1 uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <span>Human Part:</span>
+          </span>
+          <button
+            onClick={() => setActiveOrgan('heart')}
+            className={`px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1 transition-all ${
+              activeOrgan === 'heart'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Heart className="w-3 h-3" />
+            <span>Heart</span>
+          </button>
+          <button
+            onClick={() => setActiveOrgan('head')}
+            className={`px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1 transition-all ${
+              activeOrgan === 'head'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <User className="w-3 h-3" />
+            <span>Head Scan</span>
+          </button>
+          <button
+            onClick={() => setActiveOrgan('kidney')}
+            className={`px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1 transition-all ${
+              activeOrgan === 'kidney'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Crosshair className="w-3 h-3" />
+            <span>Kidney</span>
+          </button>
+          <button
+            onClick={() => setActiveOrgan('ankle')}
+            className={`px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1 transition-all ${
+              activeOrgan === 'ankle'
+                ? 'bg-cyan-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span>Ankle &amp; Talus</span>
+          </button>
+        </div>
+
+        {/* Anatomical Layer Selector (Active when viewing Ankle) */}
+        {activeOrgan === 'ankle' && (
+          <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg text-xs">
+            <span className="text-[10px] font-semibold text-slate-400 px-2 flex items-center space-x-1">
+              <Layers className="w-3 h-3 text-cyan-400" />
+              <span>Layer:</span>
+            </span>
+            <button
+              onClick={() => setActiveLayer('skin')}
+              className={`px-2 py-0.5 rounded-lg text-[11px] font-medium transition-all ${
+                activeLayer === 'skin' ? 'bg-cyan-600 text-white' : 'text-slate-400'
+              }`}
+            >
+              Skin
+            </button>
+            <button
+              onClick={() => setActiveLayer('bone')}
+              className={`px-2 py-0.5 rounded-lg text-[11px] font-medium transition-all ${
+                activeLayer === 'bone' ? 'bg-emerald-600 text-white' : 'text-slate-400'
+              }`}
+            >
+              Talus Bone
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Real-time Status Overlay within 3D Canvas */}
@@ -172,13 +234,9 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
             }`}
           />
           <span className="font-mono text-slate-300 uppercase tracking-wide">
-            Tool: Scalpel #10 &bull; {currentInput.isSelecting ? 'INCISING' : 'SURFACE ALIGN'}
+            Model: Real 3D Human {activeOrgan.toUpperCase()} &bull; {currentInput.isSelecting ? 'INCISING' : 'PROBING'}
           </span>
         </div>
-        <span className="text-slate-600">|</span>
-        <span className="font-mono text-slate-400">
-          [{currentInput.x.toFixed(2)}, {currentInput.y.toFixed(2)}]
-        </span>
       </div>
 
       {/* Target Guidance Banner */}
@@ -189,20 +247,20 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
               <Eye className="w-3.5 h-3.5" />
               <span>
                 {currentCheckpoint
-                  ? `Clinical Step ${currentCheckpoint.order}: ${currentCheckpoint.title}`
-                  : 'All Anatomical Checkpoints Completed!'}
+                  ? `Clinical Landmark ${currentCheckpoint.order}: ${currentCheckpoint.title}`
+                  : 'All Landmarks Verified!'}
               </span>
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
             {currentCheckpoint
               ? currentCheckpoint.description
-              : 'Incision verified. Proceed to the deterministic assessment performance summary.'}
+              : 'Anatomical exposure verified. View your deterministic assessment summary below.'}
           </p>
         </div>
         <div className="text-right pl-4 shrink-0">
           <span className="text-xs font-mono text-cyan-400 font-bold">
-            {completedCheckpointIds.length}/{procedure.checkpoints.length} Steps
+            {completedCheckpointIds.length}/{procedure.checkpoints.length} Landmarks
           </span>
         </div>
       </div>

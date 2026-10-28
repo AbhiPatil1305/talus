@@ -7,8 +7,8 @@ import { SimulationScene } from '../features/simulation/SimulationScene';
 import { SimulationControls } from '../features/simulation/SimulationControls';
 import { CompletionSummary } from '../features/assessment/CompletionSummary';
 import {
-  TALUS_ARTHROTOMY_PROCEDURE,
-  MCBURNEY_APPENDECTOMY_PROCEDURE,
+  ALL_PROCEDURES,
+  CARDIAC_CABG_PROCEDURE,
 } from '../features/assessment/procedureConfig';
 import {
   evaluateSession,
@@ -26,7 +26,7 @@ import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>('dashboard');
-  const [currentProcedure, setCurrentProcedure] = useState<ProcedureConfig>(TALUS_ARTHROTOMY_PROCEDURE);
+  const [currentProcedure, setCurrentProcedure] = useState<ProcedureConfig>(CARDIAC_CABG_PROCEDURE);
   const [completedCheckpointIds, setCompletedCheckpointIds] = useState<string[]>([]);
   const [recordedEvents, setRecordedEvents] = useState<SimulationEvent[]>([]);
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
@@ -49,11 +49,9 @@ export const App: React.FC = () => {
     []
   );
 
-  const startSimulation = useCallback((procedureId: string = TALUS_ARTHROTOMY_PROCEDURE.id) => {
+  const startSimulation = useCallback((procedureId: string = CARDIAC_CABG_PROCEDURE.id) => {
     const proc =
-      procedureId === MCBURNEY_APPENDECTOMY_PROCEDURE.id
-        ? MCBURNEY_APPENDECTOMY_PROCEDURE
-        : TALUS_ARTHROTOMY_PROCEDURE;
+      ALL_PROCEDURES.find((p) => p.id === procedureId) || CARDIAC_CABG_PROCEDURE;
     setCurrentProcedure(proc);
     const now = Date.now();
     setCompletedCheckpointIds([]);
