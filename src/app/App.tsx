@@ -6,6 +6,7 @@ import { DashboardView } from '../features/dashboard/DashboardView';
 import { SimulationScene } from '../features/simulation/SimulationScene';
 import { SimulationControls } from '../features/simulation/SimulationControls';
 import { CompletionSummary } from '../features/assessment/CompletionSummary';
+import { ExplorerView } from '../features/explorer/ExplorerView';
 import {
   ALL_PROCEDURES,
   CARDIAC_CABG_PROCEDURE,
@@ -201,6 +202,10 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {viewState === 'dashboard' && (
           <DashboardView onStartSimulation={startSimulation} />
+        )}
+
+        {viewState === 'explorer' && (
+          <ExplorerView onLaunchProcedure={startSimulation} />
         )}
 
         {viewState === 'simulation' && (

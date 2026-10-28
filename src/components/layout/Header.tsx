@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, LayoutDashboard, PlaySquare } from 'lucide-react';
+import { Activity, LayoutDashboard, PlaySquare, Compass } from 'lucide-react';
 import { ViewState } from '../../shared/types';
 
 interface HeaderProps {
@@ -44,6 +44,18 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
           >
             <LayoutDashboard className="w-4 h-4" />
             <span>Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('explorer')}
+            className={`inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              currentView === 'explorer'
+                ? 'bg-slate-800 text-cyan-400 border border-slate-700 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <span>Anatomy Explorer</span>
           </button>
 
           <button

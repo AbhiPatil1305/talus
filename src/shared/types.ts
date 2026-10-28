@@ -146,4 +146,29 @@ export interface SessionSummary {
 // 5. Application View Navigation State
 // ==========================================
 
-export type ViewState = 'dashboard' | 'simulation' | 'summary';
+export type ViewState = 'dashboard' | 'simulation' | 'explorer' | 'summary';
+
+// ==========================================
+// 6. 3D Anatomy Explorer Contracts
+// ==========================================
+
+export type AnatomicalSystem =
+  | 'cardiovascular'
+  | 'respiratory'
+  | 'skeletal'
+  | 'integumentary'
+  | 'all';
+
+export interface AnatomicalStructure {
+  id: string;
+  name: string;
+  latinName: string;
+  system: AnatomicalSystem;
+  meshName: string;
+  modelUrl: string;
+  category: string;
+  description: string;
+  function: string;
+  clinicalRelevance: string;
+  surgicalProcedureId?: string;
+}
