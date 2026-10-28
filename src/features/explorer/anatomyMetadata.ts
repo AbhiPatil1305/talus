@@ -293,3 +293,53 @@ export function searchStructures(query: string, system: AnatomicalSystem = 'all'
       s.function.toLowerCase().includes(normalized)
   );
 }
+
+export interface AvailableModel {
+  id: string;
+  name: string;
+  url: string;
+  system: AnatomicalSystem;
+  badge: string;
+  structureCount: number;
+  description: string;
+}
+
+export const AVAILABLE_MODELS: AvailableModel[] = [
+  {
+    id: 'human_heart_nih',
+    name: 'Human Heart & Great Vessels',
+    url: '/models/human_heart_nih.glb',
+    system: 'cardiovascular',
+    badge: 'NIH Visible Human • CC-BY 4.0',
+    structureCount: 8,
+    description: 'Coronary vasculature, aortic arch, and great vessel branches',
+  },
+  {
+    id: 'human_pelvis',
+    name: 'Pelvis & Sacral Spine',
+    url: '/models/human_pelvis.glb',
+    system: 'skeletal',
+    badge: 'NIH Visible Human • CC-BY 4.0',
+    structureCount: 6,
+    description: 'Pelvic girdle, sacrum, coccyx, ilium, and ASIS landmark',
+  },
+  {
+    id: 'human_lung',
+    name: 'Tracheobronchial Tree',
+    url: '/models/human_lung.glb',
+    system: 'respiratory',
+    badge: 'NIH 3D Print Exchange • CC0',
+    structureCount: 3,
+    description: 'Tracheal bifurcation, principal and lobar bronchi',
+  },
+  {
+    id: 'human_body_skin',
+    name: 'Full Body Surface Contour',
+    url: '/models/human_body_skin.glb',
+    system: 'integumentary',
+    badge: 'NIH Visible Human • CC-BY 4.0',
+    structureCount: 1,
+    description: 'Standing human cutaneous surface and dermatome reference',
+  },
+];
+

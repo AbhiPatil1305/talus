@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Instrument } from './Instrument';
 import { Targets } from './Target';
@@ -112,6 +112,18 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
     }
   }, [currentCheckpoint, currentInput, onSimulationEvent]);
 
+  // Target mesh name to highlight in real 3D model
+  const highlightedMeshName = useMemo(() => {
+    if (!currentCheckpoint) return null;
+    if (activeOrgan === 'heart') {
+      if (currentCheckpoint.id.includes('AORTA')) return 'VHM_ascending_aorta';
+      if (currentCheckpoint.id.includes('SVC')) return 'VHM_aortic_arch';
+      if (currentCheckpoint.id.includes('LAD')) return 'VHM_left_anterior_descending_artery';
+      if (currentCheckpoint.id.includes('APEX')) return 'VHM_vasculature';
+    }
+    return null;
+  }, [currentCheckpoint, activeOrgan]);
+
   useEffect(() => {
     checkInteraction();
   }, [checkInteraction]);
@@ -132,7 +144,11 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
         <pointLight position={[0, 4, 0]} intensity={1.0} color="#ffffff" />
 
         {/* Real 3D Human Anatomy Models */}
-        <RealAnatomyModel organType={activeOrgan} layer={activeLayer} />
+        <RealAnatomyModel
+          organType={activeOrgan}
+          layer={activeLayer}
+          highlightedMeshName={highlightedMeshName}
+        />
 
         {/* Surgical Skin Markings and Landmark Crosshairs */}
         <Targets
@@ -144,6 +160,7 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
         {/* Photorealistic Scalpel #10 Virtual Instrument */}
         <Instrument input={currentInput} isHoveringTarget={isHovering} />
       </Canvas>
+
 
       {/* Top Controls Bar: Organ Switcher & Layer Selector */}
       <div className="absolute top-4 right-4 z-20 flex flex-col sm:flex-row items-end sm:items-center gap-2">
@@ -234,7 +251,7 @@ export const SimulationScene: React.FC<SimulationSceneProps> = ({
             }`}
           />
           <span className="font-mono text-slate-300 uppercase tracking-wide">
-            Model: Real 3D Human {activeOrgan.toUpperCase()} &bull; {currentInput.isSelecting ? 'INCISING' : 'PROBING'}
+            Model: {activeOrgan === 'heart' ? 'NIH Visible Human Heart (CC-BY 4.0)' : activeOrgan === 'head' ? 'Three.js Craniofacial Scan (CC-BY 3.0)' : activeOrgan === 'ankle' ? 'Anatomical Layer Simulation' : 'Renal Parenchyma'} &bull; {currentInput.isSelecting ? 'INCISING' : 'PROBING'}
           </span>
         </div>
       </div>

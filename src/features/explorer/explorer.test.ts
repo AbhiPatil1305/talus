@@ -74,4 +74,24 @@ describe('TALUS 3D Human Anatomy Explorer Metadata & Ontology', () => {
     const lad = ANATOMICAL_STRUCTURES.find((s) => s.id === 'struct_lad_artery');
     expect(lad?.surgicalProcedureId).toBe('proc_cardiac_cabg_03');
   });
+
+  it('validates AVAILABLE_MODELS registry and ANATOMICAL_ASSET_MANIFEST transparency', async () => {
+    const { AVAILABLE_MODELS } = await import('./anatomyMetadata');
+    const { ANATOMICAL_ASSET_MANIFEST } = await import('./assetManifest');
+
+    expect(AVAILABLE_MODELS.length).toBeGreaterThanOrEqual(4);
+    for (const model of AVAILABLE_MODELS) {
+      expect(model.id).toBeTruthy();
+      expect(model.name).toBeTruthy();
+      expect(model.url).toMatch(/\.glb$/);
+      expect(model.structureCount).toBeGreaterThan(0);
+    }
+
+    const heartAsset = ANATOMICAL_ASSET_MANIFEST['human_heart_nih'];
+    expect(heartAsset).toBeDefined();
+    expect(heartAsset.isScientificallyVerified).toBe(true);
+    expect(heartAsset.license).toContain('CC-BY 4.0');
+    expect(heartAsset.verifiedMeshIdentifiers.length).toBeGreaterThan(5);
+  });
 });
+
