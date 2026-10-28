@@ -209,23 +209,8 @@ export const App: React.FC = () => {
         )}
 
         {viewState === 'simulation' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
-                  {currentProcedure.category} &bull; {currentProcedure.title}
-                </span>
-                <h1 className="text-xl font-bold text-white">
-                  {currentProcedure.title}
-                </h1>
-              </div>
-              <div className="text-xs text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Operating Theatre &bull; Deterministic Assessment</span>
-              </div>
-            </div>
-
-            {/* 3D Canvas Scene */}
+          <div className="space-y-4">
+            {/* 3D Medical Operating Theatre */}
             <SimulationScene
               procedure={currentProcedure}
               completedCheckpointIds={completedCheckpointIds}
@@ -233,7 +218,7 @@ export const App: React.FC = () => {
               onReset={handleResetSimulation}
             />
 
-            {/* Controls Toolbar */}
+            {/* Assessment Session Controls */}
             <SimulationControls
               onTriggerInvalidAction={handleTriggerInvalidAction}
               onReset={handleResetSimulation}

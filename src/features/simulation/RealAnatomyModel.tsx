@@ -91,32 +91,27 @@ export const RealAnatomyModel: React.FC<RealAnatomyModelProps> = ({
   return (
     <group>
       {/* 1. Operating Theatre Sterile Drapes & Table Background */}
-      <mesh position={[0, -0.65, 0]}>
-        <boxGeometry args={[11, 0.4, 7.5]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.8} />
+      <mesh position={[0, -0.5, 0]}>
+        <boxGeometry args={[12, 0.4, 8]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
       </mesh>
 
-      <mesh position={[0, -0.42, 0]}>
-        <boxGeometry args={[10.2, 0.08, 6.8]} />
-        <meshStandardMaterial color="#0284c7" roughness={0.7} metalness={0.1} />
-      </mesh>
-
-      {/* Sterile Drapes Sheet */}
-      <mesh position={[0, -0.32, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[9.5, 6.2]} />
-        <meshStandardMaterial color="#0369a1" roughness={0.9} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* Sterile Fenestration Aperture Ring */}
-      <mesh position={[0.0, -0.05, 0.0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[2.5, 4.4, 32]} />
-        <meshStandardMaterial color="#0284c7" roughness={0.9} side={THREE.DoubleSide} />
+      {/* Sterile Drapes Sheet (Medical Cyan) */}
+      <mesh position={[0, -0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[11, 7]} />
+        <meshStandardMaterial color="#0284c7" roughness={0.85} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Povidone-Iodine Antiseptic Prep Ring on Operative Field */}
-      <mesh position={[0.0, -0.04, 0.0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.2, 2.4, 32]} />
-        <meshBasicMaterial color="#92400e" transparent opacity={0.3} />
+      <mesh position={[0, -0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.5, 2.8, 32]} />
+        <meshBasicMaterial color="#78350f" transparent opacity={0.25} />
+      </mesh>
+
+      {/* Fenestration Aperture Opening Border */}
+      <mesh position={[0, -0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.75, 1.85, 32]} />
+        <meshStandardMaterial color="#38bdf8" roughness={0.5} />
       </mesh>
 
       {/* 2. Genuine 3D Anatomy Models */}
@@ -131,8 +126,8 @@ export const RealAnatomyModel: React.FC<RealAnatomyModelProps> = ({
         {organType === 'heart' && (
           <GLTFOrganViewer
             url="/models/human_heart_nih.glb"
-            scale={4.2}
-            rotation={[-Math.PI / 2 + 0.2, 0, 0]}
+            scale={5.2}
+            rotation={[-Math.PI / 2, 0, 0]}
             position={[0, 0.1, 0]}
             targetMeshName={highlightedMeshName}
           />
@@ -141,7 +136,7 @@ export const RealAnatomyModel: React.FC<RealAnatomyModelProps> = ({
         {organType === 'head' && (
           <GLTFOrganViewer
             url="/models/lee_perry_smith.glb"
-            scale={0.4}
+            scale={0.5}
             rotation={[Math.PI / 2, 0, 0]}
             position={[0, 0.1, 0]}
             targetMeshName={highlightedMeshName}
@@ -151,7 +146,7 @@ export const RealAnatomyModel: React.FC<RealAnatomyModelProps> = ({
         {organType === 'pelvis' && (
           <GLTFOrganViewer
             url="/models/human_pelvis.glb"
-            scale={6.5}
+            scale={7.0}
             rotation={[-Math.PI / 2, 0, 0]}
             position={[0, 0.1, 0]}
             targetMeshName={highlightedMeshName}
@@ -161,7 +156,7 @@ export const RealAnatomyModel: React.FC<RealAnatomyModelProps> = ({
         {organType === 'kidney' && (
           <GLTFOrganViewer
             url="/models/kidney.glb"
-            scale={0.7}
+            scale={0.8}
             rotation={[-Math.PI / 2, 0, 0]}
             position={[0, 0.1, 0]}
             targetMeshName={highlightedMeshName}

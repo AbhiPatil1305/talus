@@ -33,8 +33,8 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
       const success = await globalHandTracker.startWebcam(
         videoRef.current,
-        (normX, normY, isPinching, confidence) => {
-          globalInputAdapter.updateHandInput(normX, normY, isPinching, confidence);
+        (bimanualState) => {
+          globalInputAdapter.updateBimanualInput(bimanualState);
         }
       );
 

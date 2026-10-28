@@ -113,4 +113,53 @@ describe('TALUS Anatomical Assessment & Procedure Logic', () => {
     expect(result.passed).toBe(false); // below 70 threshold
     expect(result.completedCheckpointIds.length).toBe(4);
   });
+
+  it('enforces bimanual tissue stabilization requirement when specified by checkpoint', () => {
+    const completed: string[] = ['CP_01_PALPATE'];
+
+    // CP_02_ENTRY requires stabilization. Passing isStabilized = false should fail!
+    const unheldAttempt = validateEvent(
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_02_ENTRY', timestamp: 6000 },
+      TALUS_ARTHROTOMY_PROCEDURE,
+      completed,
+      false // Left hand not stabilizing!
+    );
+    expect(unheldAttempt.isValid).toBe(false);
+    expect(unheldAttempt.reason).toContain('requires left-hand tissue stabilization');
+
+    // Passing isStabilized = true succeeds!
+    const stabilizedAttempt = validateEvent(
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_02_ENTRY', timestamp: 6000 },
+      TALUS_ARTHROTOMY_PROCEDURE,
+      completed,
+      true // Left hand stabilizing!
+    );
+    expect(stabilizedAttempt.isValid).toBe(true);
+  });
+
+  it('records penalty if left-hand stabilization is lost during active incision', () => {
+    const events: SimulationEvent[] = [
+      { type: 'SIMULATION_STARTED', procedureId: TALUS_ARTHROTOMY_PROCEDURE.id, timestamp: 1000 },
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_01_PALPATE', timestamp: 4000 },
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_02_ENTRY', timestamp: 8000 },
+      // Lost stabilization during traversal:
+      {
+        type: 'INVALID_ACTION',
+        reason: 'Tissue stabilization lost during active incision',
+        checkpointId: 'CP_03_TRAVERSE',
+        timestamp: 12000,
+      },
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_03_TRAVERSE', timestamp: 16000 },
+      { type: 'CHECKPOINT_COMPLETED', checkpointId: 'CP_04_CAPSULE', timestamp: 20000 },
+    ];
+
+    const result = evaluateSession(events, TALUS_ARTHROTOMY_PROCEDURE, startTime, endTime);
+
+    // 4 checkpoints = 100 pts, 1 penalty = -15 pts -> 85 pts
+    expect(result.score).toBe(85);
+    expect(result.passed).toBe(true);
+    expect(result.errorCount).toBe(1);
+    expect(result.feedback.some((f) => f.message.includes('Tissue stabilization lost'))).toBe(true);
+  });
 });
+

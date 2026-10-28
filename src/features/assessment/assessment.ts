@@ -15,7 +15,8 @@ const STORAGE_KEY_PREFIX = 'talus_session_history_v1';
 export function validateEvent(
   event: SimulationEvent,
   config: ProcedureConfig,
-  completedCheckpointIds: string[]
+  completedCheckpointIds: string[],
+  isStabilized?: boolean
 ): { isValid: boolean; reason?: string; checkpointId?: string } {
   if (event.type !== 'CHECKPOINT_COMPLETED') {
     return { isValid: true };
@@ -47,6 +48,15 @@ export function validateEvent(
     return {
       isValid: false,
       reason: `Checkpoint out of sequence: Expected step ${expectedOrder} (${config.checkpoints[expectedOrder - 1]?.title}), but received step ${targetCheckpoint.order} (${targetCheckpoint.title}).`,
+      checkpointId: event.checkpointId,
+    };
+  }
+
+  // Check bimanual tissue stabilization requirement
+  if (isStabilized === false && targetCheckpoint.requiresStabilization) {
+    return {
+      isValid: false,
+      reason: `Surgical safety violation: Checkpoint "${targetCheckpoint.title}" requires left-hand tissue stabilization prior to active incision.`,
       checkpointId: event.checkpointId,
     };
   }
